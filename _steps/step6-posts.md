@@ -40,6 +40,7 @@ class Post(models.Model):
     def __str__(self):
         return f'{self.author}\'s post'
 ```
+Żeby model powstał w bazie danych, znowu tworzymy i puszczamy migracje.
 
 Serializer:
 
@@ -153,6 +154,19 @@ urlpatterns = [
     path('like/<uuid:post_id>/', LikeView.as_view(), name='like'),
     path('<uuid:post_id>/get-likers/', GetLikersView.as_view(), name='get-likers'),
 ]
+```
+Dodajemy naszą apke do URLs głównych znajdujących sie w folderze instagram, które po tym jak wprodzimy zmiany powinny wyglądać tak:
+```python
+from django.contrib import admin
+from django.urls import path, include
+from django.conf.urls.static import static
+from django.conf import settings
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/users/', include('users.urls')),
+    path('api/posts/', include('posts.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 
 No i znowu git :D 

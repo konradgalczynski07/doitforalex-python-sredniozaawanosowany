@@ -35,7 +35,7 @@ class User(AbstractUser):
     ...
 ```
 
-Lecimy do serializera:
+Robimy migracje i lecimy do serializera:
 
 ```python
 class UserProfileSerializer(serializers.ModelSerializer):
