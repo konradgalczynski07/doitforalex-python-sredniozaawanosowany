@@ -20,7 +20,7 @@ Jeśli wszystko się zgadza możemy przejść dalej.
 Na nasze szczęscie cała infrastruktura oraz ustawienia projektu zostały już zrobione a więc bedziemy mogli bardzo szybko zabrać się za kodowanie nowych ficzerów. Przejdźmy zatem pod poniższy link i zastosujmy się do instrukcji podanej w README.  
 
 ```
-https://github.com/konradgalczynski07/doitforalex-instagram-backend-end
+https://github.com/konradgalczynski07/doitforalex-instagram-backend-start
 ```
 
 ## Pliki startowe
