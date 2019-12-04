@@ -15,6 +15,8 @@ Powinieś mieć już zainstalowane i gotowe do użytku poniższe narzędzia:
 
 Jeśli wszystko się zgadza możemy przejść dalej. 
 
+## Instalacja projektu
+
 Na nasze szczęscie cała infrastruktura oraz ustawienia projektu zostały już zrobione a więc bedziemy mogli bardzo szybko zabrać się za kodowanie nowych ficzerów. Przejdźmy zatem pod poniższy link i zastosujmy się do instrukcji podanej w README.  
 
 ```
@@ -48,12 +50,9 @@ doitforalex-instagram-backend
 │ Dockerfile  
 │ Makefile  
 │ requirements.txt  
-│ wait_for_postgres.py
 ```
 
 Powyżej znajduje się list plików, więkoszość omówiomy krótko skupiając sie na najważniejszych.
-
-`wait_for_postgres.py` - skrypt odpowiedzialny za sprawdzenie czy baza postgresowa jest już czynna i dostępna dla naszej aplikacji.
 
 `requirements.txt` - plik z wymaganymi paczkami do zainstalowania, inaczej zależnościami (ang. dependencies)
 
@@ -71,7 +70,7 @@ Powyżej znajduje się list plików, więkoszość omówiomy krótko skupiając 
 
 `instagram-backend` - w tym folderze znajduje się projekt Django, poza folderem z ustawieniami znajduje się tam również pierwsza aplikacja users, niestety jest pusta ale na to przyjdzie jeszcze czas
 
-## Settingsy
+## Settingsy Django
 
 W plikach Django jedyne zmiany zostały wykonane w pliku `settings.py` omówmy je więc. 
 
@@ -116,5 +115,16 @@ REST_FRAMEWORK = {
 
 Zatemy skoro mamy przygotowany projekt czas brać się do pracy. W następnej sekcji zastanowimy się nad architektura oraz modelem bazy tak żeby aplikacja spełniała wymagania biznesowe.
 
+## Media 
 
+W settingsach ustawiliśmy też lokalizacje w której będą przechowywane pliki graficzny:
 
+```python
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+```
+
+Plików tych nie chcemy dodawać do repozytorium dlatego póki co nie mamy folderu `media`. Stwórzmy ten folder w folderze projektu Django `instagram-backend` a następnie przenieśmy tam dostarczony plik `avatar.png`, który przyda nam się później.
+
+Możemy teraz zająć się kwestiami architektury systemu.

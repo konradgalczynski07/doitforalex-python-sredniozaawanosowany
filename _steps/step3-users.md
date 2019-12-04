@@ -1,40 +1,40 @@
 ---
 layout: step
 number: 3
-title: Użytkownicy, logowanie i rejestracja
+title: Użytkownicy
 permalink: step3/
 ---
 
-Przejdzmy zatem do implementacji naszego pierwszego modelu. 
+Przejdzmy wreszcie do implementacji naszego pierwszego modelu. Ten rozdział przeznaczony jest do części wykładowej w związku z czym  możecie przepisywać bądz kopiować kod. Naszym celem będzie omówienie, zrozumienie go i odwoływanie się do niego w celu referencji w późniejszych zadaniach. W dalszej części warsztatów przewidziane jest samodzielne wykonanie zadań.
 
-Najpierw skopiuj do modelu:
+## Models
+
+Na pierwszy ogień malutki model User. 
 
 ```python
-import uuid
-import os
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
-
-def image_file_path(instance, filename):
-    """Generate file path for new recipe image"""
-    ext = filename.split('.')[-1]
-    filename = f'{uuid.uuid4()}.{ext}'
-
-    return os.path.join('uploads/', filename)
 
 
 class User(AbstractUser):
     email = models.EmailField(max_length=255, unique=True)
     fullname = models.CharField(max_length=60, blank=True)
     bio = models.TextField(blank=True)
-    profile_pic = models.ImageField(upload_to=image_file_path, default='avatar.png')
+    profile_pic = models.ImageField(default='avatar.png')
 
     def __str__(self):
         return self.username
 ```
 
-Puszczamy migracje i zeby mozna rejestrowac nowych uzytkowników piszemy serializer:
+Najważniejszą kwestią w modelu User jest to że dziedziczy on po klasie `AbstractUser` czyli rozbudowanym modelu User'a dostarczonym przez Django. Wejdzmy w tę klasę i rozejrzyjmy się. Nas najbardziej interesują dwa pola jakie dostarcza: `username` oraz `email`. Po którtkiej analizie dochodzimy do wniosku że pole username spełnia nasze wymagania ale pole email nie posiada atrybutu `unique` dlatego też to pole nadpiszemy. Ponadto dodamy pola `fullname, bio, profile_pic`.
+
+Gdy mamy uzupełniony model stwórzmy plik migracyjny i odpalmy migracje:
+```
+python manage.py makemigrations
+python manage.py migrate
+```
+
+Na endpointach REST API chcemy zwracać zserializowane dane w związku z tym napiszmy serializer w nowo utworzonym pliku `serializers.py`. Zaimplenetujmy najpierw ten odpowiedzialny za rejestrację nowych użytkowników:
 
 ```python
 from django.contrib.auth import get_user_model
@@ -56,6 +56,8 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         return User.objects.create_user(**validated_data)
 ```
 
+Dziedziczymy tutaj po klasie `serializers.ModelSerializer` dostarczonej przez rest_framework dzięki której możemy odwołać sie do opowiedniego modelu i sprecyzować jakie pola mają zostać zserializowane. Dostarcza ona również metody do tworzenia (create) i aktualizowania obiektu (update). My nadpiszemy metodę create zeby zwracała nowo stworzonego usera. W pliku views.py do którego zaraz przejdziemy sprecyzujemy że chcemy korzystać tylko z metody create.
+
 Przechodzimy do viewsów:
 
 ```python
@@ -68,7 +70,9 @@ class RegisterUserView(generics.CreateAPIView):
     permission_classes = (permissions.AllowAny,)
 ```
 
-Teraz pozostały juz tylko urls'y:
+Jak widać tyle linijek kody wystarczy by stworzyć nowy widok. Dziedziczmy tutaj po klasie `generics.CreateAPIView` która jak sama nazwa wskazuje pozwala na tworzenie, ponadto określamy atrybuty serializer_class i permission_classes.
+
+Teraz pozostało juz tylko zarejestrować widok w pliku urls.py:
 
 ```python
 from django.urls import path
@@ -85,7 +89,7 @@ urlpatterns = [
 ]
 ```
 
-no i jeszcze załaczmy powyższe urls'y w głównym pliku ulrs.py:
+no i jeszcze załączmy powyższe urls'y w głównym pliku instagram/ulrs.py oraz podłaczmy lokalizacje plików statycznych
 
 ```python
 from django.contrib import admin
@@ -99,7 +103,15 @@ urlpatterns = [
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 ```
 
-Super mamy juz rejestracie i logowanie ! Dopiszmy jeszcze funkcjonalność zarzadania profilem użytkownika. Model juz mamy, zaczynamy od serializera, napiszmy wieć:
+Co ciekawe rozszerzenie djangorestframework-jwt dostarcza nam 'out of the box' rozwiazanie do logowania użytkowników. Dokładniej jest to funkcja `obtain_jwt_token` - będzie ona zwracała token JWT którym możemy się potem zalogować.
+
+Sprawdzmy teraz w aplikacji frontendowej na localhost:3000 czy wszystko działa. Zarejestrujmy nowego użytkownika a potem zalogujmy się nim. 
+
+To samo sprawdzmy na backendzie - wjedzmy na endpoint `localhost:8000/api/users/register` a następnie `localhost:8000/api/users/login`. By móc być zalogowanym na porcie 8000 i korzystać z interfejsu graficznego DRF'a dodajmy Authorization header z otrzymanym tokenem we wtyczce do Chrome'a - ModHeaders:
+
+![ModHeaders](../assets/step2-modheaders.png)
+
+Super mamy juz rejestracie i logowanie ! Dopiszmy jeszcze funkcjonalność zarządania profilem użytkownika. Model już mamy, zaczynamy więc od serializera, napiszmy:
 
 ```python
 class UserSerializer(serializers.ModelSerializer):
@@ -130,9 +142,15 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 ```
 
-Lecimy do viesów: 
+Jak już wspomnialiśmy `serializers.ModelSerializer` dostarcza metody create oraz update, tutaj nadpisujemy metodę update dostosowująć ją do naszych potrzeb tj. ustawiamy hasło metodą `set_password` by było ono zahashowane.
+
+Lecimy do viesów, tym razem skorzytamy z `generics.RetrieveUpdateDestroyAPIView` służącego do czynności podanych w nazwie klasy. By powiedzieć klasie jakiego dokładnie obiektu musi poszukać dodajemy metodę `get_object` która zwraca użytkownika którym wysłał zapytanie (request): 
 
 ```python
+from users.serializers import RegisterUserSerializer, UserSerializer
+
+...
+
 class UserView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
@@ -140,10 +158,13 @@ class UserView(generics.RetrieveUpdateDestroyAPIView):
         return self.request.user
 ```
 
-i dodajemy url: 
+i dodajemy nowy path: 
 
 ```python
-from users.serializers import UserSerializer, RegisterUserSerializer
+...
+from users.views import RegisterUserView, UserView
+
+app_name = 'users'
 
 urlpatterns = [
     path('register/', RegisterUserView.as_view(), name='register'),
@@ -152,47 +173,38 @@ urlpatterns = [
 ]
 ```
 
-Jest gites ! Sprawdzmy zatem nasza apke reactowa. Jak widzicie mozemy z jej poziomu sie zarejestrować oraz zalogowac, czad right ?
-A zauyważyliscie może ze nie ładuje nam sie logo usera ? Jak wejdziemy w dev toolsy w Network tab możemy zwrocić uwage że nasz frontend wysyła tylko request na /feed, skąd zatem mamy username i inne dane a avatar nie. Tutaj wkracza ciekawa właściwość JWT - możemy zakodować w nim payload czyli jakies dane ktore nastepnie odkodujemy na frontendzie. Defaultowo zakodowany jest tylko username ale możemy do zmienić. Stworzmy w projekcie nowy folder utils a w nim plik `jwt_payload.py`
+Gratulacje świetnie nam idzie! Sprawdzmy zatem nasz nowy endpoint. Pamietaj dodać Authorization header we wtyczce ModHeaders.
+
+Wracająć do frontendu, jak widzicie możemy dostać się na feed page. A zauważyliscie może ze nie ładuje nam sie logo usera ? Jak wejdziemy w dev toolsy w Network tab możemy zwrocić uwage że nasz frontend wysyła tylko request na /feed, skąd zatem mamy username i inne dane a avatar nie. Tutaj wkracza ciekawa właściwość JWT - możemy zakodować w nim payload czyli jakies dane które nastepnie odkodujemy na frontendzie. Defaultowo zakodowany jest tylko username ale możemy to zmienić. Stworzmy w projekcie nowy folder utils a w nim plik `jwt_payload.py`
 
 Plik jwt_payload.py:
 
 ```python
-import uuid
 from datetime import datetime
 
-from rest_framework_jwt.compat import get_username
-from rest_framework_jwt.compat import get_username_field
 from rest_framework_jwt.settings import api_settings
 
 
 def jwt_payload_handler(user):
     """Slightly customized jwt payload that include user profile picture"""
 
-    username_field = get_username_field()
-    username = get_username(user)
-
     payload = {
         'user_id': user.pk,
-        'username': username,
+        'username': user.username,
+        'fullname': user.fullname,
         'profile_pic': user.profile_pic.url,
         'exp': datetime.utcnow() + api_settings.JWT_EXPIRATION_DELTA,
     }
-    if hasattr(user, 'fullname'):
-        payload['fullname'] = user.fullname
-
-    payload[username_field] = username
 
     return payload
 ```
 
-Potem zarejestrujmy to w settingsach, na góre dodajmy import a na samym dole JWT_AUTH:
+Potem zarejestrujmy to w settingsach, na górze pliku dodajmy import a na samym dole ustawienia JWT_AUTH:
 
 ```python 
 from datetime import timedelta
-
-...
-
+```
+```python
 # JWT
 JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': timedelta(hours=36),
@@ -200,4 +212,6 @@ JWT_AUTH = {
 }
 ```
 
-Jest gites w kuj !
+Przelogujmy się i sprawdzmy czy tym razem avatar jest widoczny.
+
+Najtrudniejsze mamy już za sobą, przejdziemy teraz to napisania paru prostych testów do naszych endpointów.

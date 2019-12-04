@@ -5,7 +5,7 @@ title: Posty
 permalink: step6/
 ---
 
-Robimy posty, stworzmy nową apke za pomocą `python manage.py startapp`, a nastepnie dodajmy ja do INSTALLED_APPS i include w głowym pliku urls.py
+Robimy posty, stworzmy nową apke za pomocą `python manage.py startapp`, a nastepnie dodajmy ją do INSTALLED_APPS i załaczmy w głowym pliku urls.py
 
 Bierzemy się za tworzenie modelu:
 
@@ -136,6 +136,7 @@ class UserFeedView(generics.ListAPIView):
 ```
 
 URLs:
+
 ```python
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter

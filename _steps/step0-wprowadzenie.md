@@ -11,14 +11,19 @@ Zanim zaczniemy trochę teori. Opowiedzmy sobie:
 - jak działa dziedziczenie
 - czym jest protokół HTTP i po co będzie nam potrzebny
 - czym jest API i REST
-- co to Docker i jakie będzie jego zadanie w naszym projekcie
 - jak kiedyś budowano strony przy użyciu Django
 - jak obecnie buduję się aplikacje przy użyciu Django i DRF
+- co to Docker i jakie będzie jego zadanie w naszym projekcie
 
 Zacznijmy jednak od szybkiego zdefiniowania pojęć, które często będą padały podczas warsztatów:
 
-- klient, serwer - klient to nasza przeglądarka a serwer to maszyna, do której wysyłamy żądania
+- klient, serwer - klient to nasza przeglądarka a serwer to maszyna do której wysyłamy żądania
 - endpoint - URL po stronie serwera
+- request - żadanie np. od klienta do serwera
+- response - odpowiedz np. od serwera do klienta
+- obiekt - instancja klasy
+- dziedziczenie - rozszerzanie klasy innymi klasami np. rozszerzenie klasy A innymi klasami poskutkuję ze klasa A będzie miała wszystkie własnosci klas po których dziedziczy
+- nadpisywanie - cecha pozwalająca klasie pochodnej na specyficzną implementację metody która została już zdefiniowana w jednej z klas bazowych
 
 
 ## Co to znaczy ze w Pythonie wszystko jest obiektem
@@ -29,7 +34,7 @@ Bardzo często mówi się ze w pythonie wszystko jest obiektem ale co to tak nap
 
 
 
-## Obiektowość
+## Dziedziczenie
 
 - obiektowość to bardzo rozległy temat, dlatego póki co chciałbym upewnić się ze wszyscy wiecie co robi taki kod.
 
@@ -48,6 +53,8 @@ class Bike(Wheel):
 ```
 
 Jest to przykład bardzo często występującego w programowaniu dziedziczenia. Jak wiemy samochód jak i rower mają opony więc żeby nie musieć pisać tego samego kodu wiele razy robimy z opony osobną klase a następnie dziedziczymy po niej wtedy klasa Car i Bike będą miały wszystko co ma w sobie klasa Wheel.
+
+Z dziedziczenia będziemy bardzo dużo korzystać podczas używania frameworków webowych.
 
 
 ## HTTP
@@ -78,26 +85,13 @@ Jest to przykład bardzo często występującego w programowaniu dziedziczenia. 
 
 Z racji ze nie jestem fanem regułek i sam musiałem to wygooglować na tym pozostawiny defincje. Niedługo sami przekonacie się co to API i jak wygląda "od środka"
 
-- W naszej aplikacji bedziemy posługiwać sie JavaScript Object Notation (JSON) do wymiany danych pomiędzy backendem a frontendem. Po co nam JSON ? Otóż w pythonie wszystko jest obiektem (o czym zaraz) a my bedziemy chcieli nadać tym obiektom postać podobną do pythonowych słowników czyli zserializować je. Przykład jsona w naszej aplikacji:
+- W naszej aplikacji bedziemy posługiwać sie JavaScript Object Notation (JSON) do wymiany danych pomiędzy backendem a frontendem. Po co nam JSON ? Otóż bedziemy chcieli nadać pythonowym obiektom postać podobną do słowników (ang. dict) czyli zserializować je do postaci oczekiwanej przez frontend. Przykład jsona w naszej aplikacji:
 
 ![REST_API](../assets/step0-restapi.png)
 
-## Docker
-
-- Docker to narzędzie które uruchamia wirtualny system a w tym systemie można uruchamiać aplikacje (kontenery). Został stworzony żeby tworzenie i wdrażanie aplikacji było łatwiejsze, dzięki niemu aplikacje z jej wszystkimi zależnościami można spakować w "paczke" czyli image. To pozwala nam na unikniecie wielu problemów ponieważ zapewnia ze środowisko zawsze będzie takie same, niezależnie od systemu bazowego maszyny.
-- Docker-compose jest narzędziem do definiowania i odpalania wielokontenerowych Dockerowych aplikacji (inaczej wielu image'ów dockerowych)
-
-W naszej aplikacji będziemy korzystali z frontendu przygotowanego wcześniej przez frontendowców i spakowanego do takiej paczki. Jedyne co będziemy musieli zrobić to pobrać tę paczkę i ja uruchomić. Zrobimy to za pomoca jednej komendy `docker-compose up --build`. Już niebawem sami zobaczymy jakie to przyjemne.
-
-
-Poniższy diagram wizualizuje jak to wszystko się ze sobą łaczy. Podane 3 kontenery to: frontend, backend i baza danych postgres.
-
-![Docker](../assets/step0-docker.png)
-
-
 ## Old way of doing things - Django + HTML + CSS
 
-Jeszcze pare lat temu kiedy frameworki JS'owe nie były tak dobre i popularne aplikacje Django na każdy request wysłany przez klienta odpowiadało renderując plik HTML (jak na slajdzie 'HTTP'). Przykład:
+Jeszcze pare lat temu kiedy frameworki JS'owe nie były tak dobre i popularne aplikacje Django na każdy request wysłany przez klienta odpowiadało renderując plik HTML (jak na slajdzie 'HTTP'). Przykład widoku:
 
 ```python
 def profile(request, username):
@@ -115,7 +109,7 @@ Funkcja ta zwraca plik HTML do którego przekazuje model user'a by tam wyciągna
 
 Kiedy na frontendzie zaczęła panować moda na React'a, Angulara czy Vue do akcji wkroczyło również REST API. Jak już sie pewnie domyślacie zwraca nam ono tylko dane tekstowe w postaci JSON'a w (klucz: watość jak w słowniku). Jest to o tyle fajne ze zbundlowane pliki HTML i CSS możemy wysłać tylko raz a następnie pobierać z odpowiednich endpointów lekkie dane tekstowe. Schemat ten przedstawia slajd 'REST API' wyżej.
 
-Przykład:
+Przykład widoku:
 
 ```python
 class SampleView(APIView):
@@ -123,3 +117,17 @@ class SampleView(APIView):
         data = {'sample': 'sample JSON Response'}
         return Response(data)
 ```
+
+## Docker
+
+- Docker to narzędzie które uruchamia wirtualny system a w tym systemie można uruchamiać aplikacje (kontenery). Został stworzony żeby tworzenie i wdrażanie aplikacji było łatwiejsze, dzięki niemu aplikacje z jej wszystkimi zależnościami można spakować w "paczke" czyli image. To pozwala nam na unikniecie wielu problemów ponieważ zapewnia ze środowisko zawsze będzie takie same, niezależnie od systemu bazowego maszyny.
+- Docker-compose jest narzędziem do definiowania i odpalania wielokontenerowych Dockerowych aplikacji (inaczej wielu image'ów dockerowych)
+
+W naszej aplikacji będziemy korzystali z frontendu przygotowanego wcześniej przez frontendowców i spakowanego do takiej paczki. Jedyne co będziemy musieli zrobić to pobrać tę paczkę i ja uruchomić. Zrobimy to za pomoca jednej komendy `docker-compose up --build`. Już niebawem sami zobaczymy jakie to przyjemne.
+
+
+Poniższy diagram wizualizuje jak to wszystko się ze sobą łaczy. Podane 3 kontenery to: frontend, backend i baza danych postgres.
+
+![Docker](../assets/step0-docker.png)
+
+Mamy trochę teorii omówionej więc przejdzmy do postawienia projektu. 
