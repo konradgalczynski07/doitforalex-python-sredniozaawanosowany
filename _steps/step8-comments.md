@@ -63,23 +63,10 @@ class AddCommentView(generics.CreateAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ManageCommentView(generics.RetrieveUpdateDestroyAPIView):
-    lookup_url_kwarg = 'comment_id'
-    serializer_class = CommentSerializer
-    permission_classes = (IsOwnerOrPostOwnerOrReadOnly,)
-
-    def get_queryset(self):
-        queryset = Comment.objects.all()
-        return queryset
 ```
 
 oraz dwa nowe urle:
 
 ```python
     path('comment/<uuid:post_id>/', AddCommentView.as_view(), name='add-comment'),
-    path(
-        'comment/<int:comment_id>/', ManageCommentView.as_view(), name='manage-comment'
-    ),
 ```

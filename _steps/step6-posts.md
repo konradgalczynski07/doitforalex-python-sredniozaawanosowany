@@ -5,17 +5,14 @@ title: Posty
 permalink: step6/
 ---
 
-Robimy posty, stworzmy nową apke za pomocą `python manage.py startapp`, a nastepnie dodajmy ją do INSTALLED_APPS i załaczmy w głowym pliku urls.py
+By stworzyć posty, zróbmy nową apke za pomocą `python manage.py startapp posts`, a nastepnie dodajmy ją do INSTALLED_APPS.
 
 Bierzemy się za tworzenie modelu:
 
 ```python
 import uuid
-import os
 from django.db import models
 from django.conf import settings
-
-from users.models import image_file_path
 
 
 class Post(models.Model):
@@ -23,7 +20,7 @@ class Post(models.Model):
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_posts'
     )
-    photo = models.ImageField(upload_to=image_file_path, blank=False, editable=False)
+    photo = models.ImageField(blank=False, editable=False)
     text = models.TextField(max_length=500, blank=True)
     location = models.CharField(max_length=30, blank=True)
     posted_on = models.DateTimeField(auto_now_add=True)
@@ -42,7 +39,7 @@ class Post(models.Model):
 ```
 Żeby model powstał w bazie danych, znowu tworzymy i puszczamy migracje.
 
-Serializer:
+W postach bedziemy chcieli mieć dokładne dane autora, żeby to zrobić stworzymy najpierw `AuthorSerializer` a następnie użyjemy go jako zagnieżdzonego serializera w `PostSerializer`
 
 ```python 
 from django.contrib.auth import get_user_model
@@ -81,13 +78,13 @@ class PostSerializer(serializers.ModelSerializer):
         return user in obj.likes.all()
 ```
 
-Views:
+Teraz możemy dodać widok bazujący na ModelViewSecie - dzieki niemu bedziemy mogli zrobić CRUD'a (create, retreive, update, delete) na danym obiekcie.
 
 ```python
-from rest_framework import permissions, viewsets, generics
+from rest_framework import viewsets, generics
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from posts.serializers import PostSerializer, AuthorSerializer
+from posts.serializers import PostSerializer
 from posts.models import Post
 
 
@@ -97,8 +94,41 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+```
+
+Rejestrujemy ten widok w nowo stworzonym pliku urls.py w folderze posts:
+
+```python
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
+from posts.views import PostViewSet
 
 
+router = DefaultRouter()
+router.register('', PostViewSet)
+
+app_name = 'posts'
+
+urlpatterns = [
+    path('', include(router.urls)),
+]
+```
+
+i dodajmy je do głównego pliku urls.py, poniżej sciezki '/api/users/' dodajmy posty:
+
+```python
+    path('api/posts/', include('posts.urls')),
+```
+
+
+Do rejestrowania viewsetów używa się routerów. Stworzy on za nas wszystkie potrzebne scieżki.
+
+Sprawdzmy teraz czy możemy dodać nowego Posta przy użyciu backendowego interfesju graficznego i przeglądarce. 
+
+Jeśli wszystko działa przejdzmy do lajków.
+
+```python
 class LikeView(APIView):
     def get(self, request, format=None, post_id=None):
         post = Post.objects.get(pk=post_id)
@@ -111,18 +141,32 @@ class LikeView(APIView):
             post.likes.add(user)
         data = {'like': like}
         return Response(data)
+```
+
+Tutaj korzystamy z APIView i implementujemy własną logikę w funkcji GET która będzie obsługiwać zapytania GET i przełączać like/unlike.
+Rejestrujemy widok i sprawdzamy aplikacje.
+
+```python
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
+from posts.views import PostViewSet, LikeView
 
 
-class GetLikersView(generics.ListAPIView):
-    serializer_class = AuthorSerializer
-    permission_classes = (permissions.AllowAny,)
+router = DefaultRouter()
+router.register('', PostViewSet)
 
-    def get_queryset(self):
-        post_id = self.kwargs['post_id']
-        queryset = Post.objects.get(pk=post_id).likes.all()
-        return queryset
+app_name = 'posts'
 
+urlpatterns = [
+    path('like/<uuid:post_id>/', LikeView.as_view(), name='like'),
+    path('', include(router.urls)),
+]
+```
 
+Koleja na strone głowna z postami, tworzymy widok.
+
+```python
 class UserFeedView(generics.ListAPIView):
     serializer_class = PostSerializer
 
@@ -135,13 +179,13 @@ class UserFeedView(generics.ListAPIView):
         return queryset
 ```
 
-URLs:
+ Widok znowu rejestrujemy:
 
 ```python
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from posts.views import PostViewSet, LikeView, GetLikersView, UserFeedView
+from posts.views import PostViewSet, LikeView, UserFeedView
 
 
 router = DefaultRouter()
@@ -151,23 +195,9 @@ app_name = 'posts'
 
 urlpatterns = [
     path('feed/', UserFeedView.as_view(), name='feed'),
-    path('', include(router.urls)),
     path('like/<uuid:post_id>/', LikeView.as_view(), name='like'),
-    path('<uuid:post_id>/get-likers/', GetLikersView.as_view(), name='get-likers'),
+    path('', include(router.urls)),
 ]
 ```
-Dodajemy naszą apke do URLs głównych znajdujących sie w folderze instagram, które po tym jak wprodzimy zmiany powinny wyglądać tak:
-```python
-from django.contrib import admin
-from django.urls import path, include
-from django.conf.urls.static import static
-from django.conf import settings
 
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/users/', include('users.urls')),
-    path('api/posts/', include('posts.urls')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-```
-
-No i znowu git :D 
+Jeśli wszystko działa wychodzi na to że mamy już wiekoszość pracy za sobą! Spójrzmy teraz na uprawnienia.

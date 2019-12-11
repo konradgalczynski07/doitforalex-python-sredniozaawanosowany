@@ -65,7 +65,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 Dodajemy nowy UserProfileSerializer tak żeby posiadał wszystkie pola które potrzebne są w profilu użytkownika. Zwróć uwagę ze ma on tez metody klasy User tj. `number_of_followers` oraz `number_of_following`. Co więcej dodaliśmy customowe pole za pomocą `serializers.SerializerMethodField()` w której okreslamy czy użytkownik wysyłający zapytanie obserwuję użytkownika którego dotyczy zapytanie.
 
-Potem we views'ach importujemy te serializery oraz dodajemy pierwszy widok:
+Potem we views'ach importujemy te serializery oraz dodajemy pierwszy widok odpowiadający za profil użytkownika:
 
 ```python
 from django.contrib.auth import get_user_model
@@ -94,7 +94,7 @@ class UserProfileView(generics.RetrieveAPIView):
 Ten krótki widok pozwoli na wyświetlanie profilu użytkownika. Poprzez `lookup_field` określamy po jakim polu chcemy wyszukiwać użytkowników (dodamy to potem w scieżce za pomocą `<slug:username>`)
 
 
-Dodajmy kolejny widok:
+Dodajmy kolejny widok odpowiedzialny za obsługę żądania obserwowacji użytkownika:
 
 ```python
 ...

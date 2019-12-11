@@ -5,9 +5,7 @@ title: Użytkownicy
 permalink: step3/
 ---
 
-Przejdzmy wreszcie do implementacji naszego pierwszego modelu. Ten rozdział przeznaczony jest do części wykładowej w związku z czym  możecie przepisywać bądz kopiować kod. Naszym celem będzie omówienie, zrozumienie go i odwoływanie się do niego w celu referencji w późniejszych zadaniach. W dalszej części warsztatów przewidziane jest samodzielne wykonanie zadań.
-
-## Models
+Przejdzmy wreszcie do implementacji naszego pierwszego modelu. Zachęcamy do przepisywania kodu zamiast kopiowania go. Naszym celem będzie omówienie, zrozumienie go i odwoływanie się do niego w celu referencji w późniejszych zadaniach.
 
 Na pierwszy ogień malutki model User. 
 

@@ -5,7 +5,7 @@ title: Uprawnienia
 permalink: step7/
 ---
 
-To bedzie krotkie. Permissions - uprawnienia. Dodajemy plik permissions.py w apce posts
+Być może zwróciłeś uwagę ze każdy post może edytować każdy użytkownik? By to zmienić stwórzmy w folderze posts plik permissions.py w którym stworzymy własne klasy uprawnień. By to zrobić musimy dziedziczyć po klasie `permissions.BasePermission`.
 
 ```python
 from rest_framework import permissions
@@ -49,4 +49,6 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = (IsOwnerOrReadOnly, permissions.IsAuthenticatedOrReadOnly)
 ```
 
-Git
+Teraz posty będą edytowalne tylko dla właścicieli.
+
+Czas na komentarze.

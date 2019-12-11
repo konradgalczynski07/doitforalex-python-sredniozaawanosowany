@@ -40,33 +40,30 @@ Projekt: Instagram Clone
 
 Agenda: 
 
-1. Wprowadzenie:
+0. Wprowadzenie:
     - Pythonowe obiekty
     - Dziedziczenie
-    - Protokul HTTP, metody i kody statusów HTTP
+    - Protokół HTTP, metody i kody statusów HTTP
     - API, REST i JSON
     - Old way of doing things - Django + HTML + CSS
     - New way of doing things - Django + DRF + JS & HTML & CSS
     - Docker
 
-2. Projekt setup:
+1. Projekt setup:
     - Instalacja projektu
     - Pliki startowe
     - Settingsy Django
 
-3. Architektura: 
-    - database schema
-    - mvc workflow, schemat w django / django rest framework
+2. Architektura: 
+    - Database schema
+    - Django + DRF workflow for building endpoints
+    - Viewsy dostarczone przez DRF 
 
-4. Użytkownicy:
-    - custom user model:
-    - jwt 
+3. Użytkownicy
 
-5. Testy
-    - idea testów jednostkowych
-    - test user api
+4. Testy
 
-5. User profile and Followers system
+5. Followersi
 
 6. Posty i lajki
 
