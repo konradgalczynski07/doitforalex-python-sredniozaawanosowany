@@ -64,10 +64,10 @@ Z dziedziczenia będziemy bardzo dużo korzystać podczas używania frameworków
 
 - Nas najbardziej będą interesować metody http oraz kody statusów zwracanych przez serwer. Najważniejsze metody i statusy to:
 
-    - metoda GET - kiedy chcemy pobrać jakieś dane, np. kiedy wchodzimy pierwszy raz na strone klikając enter po wpisaniu URL wysyłamy żadanie GET. Jeśli nasze żądanie się powiedzie otrzymujemy status code 200 Ok.
-    - metoda POST - kiedy chcemy wysłać dane, np. klikając 'Wyślij formularz' z wypełnionymi danymi. Jeśli nasze żądanie się powiedzie otrzymujemy status code 201 Created.
-    - metoda PUT i PATCH - kiedy chcemy zupdatować jakieś dane. PUT aktualizuje cały obiekt a PATCH to inaczej 'partial update' czyli może akutalizować tylko wybrane pola. Jeśli nasze żądanie się powiedzie otrzymujemy status code 200 Ok.
-    - metoda DELETE - do usuwania danych. Jeśli nasze żądanie sie powiedzie otrzymujemy status code 204 No content.
+    - metoda GET - kiedy chcemy pobrać dane, np. kiedy wchodzimy pierwszy raz na strone klikając enter po wpisaniu URL wysyłamy żadanie GET. Jeśli żądanie się powiedzie otrzymujemy status code 200 Ok.
+    - metoda POST - kiedy chcemy wysłać dane, np. klikając 'Wyślij formularz' z wypełnionymi danymi. Jeśli żądanie się powiedzie otrzymujemy status code 201 Created.
+    - metoda PUT i PATCH - kiedy chcemy zaktualizować dane. PUT aktualizuje cały obiekt a PATCH to inaczej 'partial update' czyli może akutalizować tylko wybrane pola. Jeśli żądanie się powiedzie otrzymujemy status code 200 Ok.
+    - metoda DELETE - do usuwania danych. Jeśli żądanie sie powiedzie otrzymujemy status code 204 No content.
     - status 200 Ok - żądanie powiodło się. 
     - status 201 Created - żądanie powiodło się, obiekt został stworzony
     - status 204 No content - żadanie powiodło się, obiekt został usuniety
@@ -103,7 +103,7 @@ def profile(request, username):
     return render(request, 'profiles/profile.html', context)
 ```
 
-Funkcja ta zwraca plik HTML do którego przekazuje model user'a by tam wyciągnać z niego dane. Takie podejście niestety było bardzo nie efektywne ponieważ wysyłanie nowego pliku HTML co każde zapytanie wiązało się z duża ilością przesyłanych danych.
+Funkcja ta zwraca plik HTML do którego przekazuje model user'a by tam wyciągnać z niego dane. Takie podejście niestety było bardzo nieefektywne ponieważ wysyłanie nowego pliku HTML co każde zapytanie wiązało się z duża ilością przesyłanych danych.
 
 ## New way of doing things - Django + DRF + JS & HTML & CSS
 

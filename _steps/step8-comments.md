@@ -48,7 +48,7 @@ Dodaj to pole w fieldsach w Class Meta i mozemy przejsc do viewsow. Importujemy 
 - CommentSerializer
 - model Comment
 
-Dodajemy teraz dwa viesy
+Dodajemy widok od dodawania komentarzy:
 ```python
 class AddCommentView(generics.CreateAPIView):
     serializer_class = CommentSerializer
@@ -65,7 +65,7 @@ class AddCommentView(generics.CreateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 ```
 
-oraz dwa nowe urle:
+oraz nowy url:
 
 ```python
     path('comment/<uuid:post_id>/', AddCommentView.as_view(), name='add-comment'),

@@ -124,7 +124,7 @@ i dodajmy je do głównego pliku urls.py, poniżej sciezki '/api/users/' dodajmy
 
 Do rejestrowania viewsetów używa się routerów. Stworzy on za nas wszystkie potrzebne scieżki.
 
-Sprawdzmy teraz czy możemy dodać nowego Posta przy użyciu backendowego interfesju graficznego i przeglądarce. 
+Sprawdzmy teraz czy możemy dodać nowego Posta przy użyciu backendowego interfesju graficznego w przeglądarce. 
 
 Jeśli wszystko działa przejdzmy do lajków.
 
@@ -164,7 +164,7 @@ urlpatterns = [
 ]
 ```
 
-Koleja na strone głowna z postami, tworzymy widok.
+Kolej na strone głowna z postami, tworzymy widok.
 
 ```python
 class UserFeedView(generics.ListAPIView):
