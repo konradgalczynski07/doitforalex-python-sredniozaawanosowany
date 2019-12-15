@@ -142,7 +142,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 Jak już wspomnialiśmy `serializers.ModelSerializer` dostarcza metody create oraz update, tutaj nadpisujemy metodę update dostosowująć ją do naszych potrzeb tj. ustawiamy hasło metodą `set_password` by było ono zahashowane.
 
-Lecimy do viesów, tym razem skorzytamy z `generics.RetrieveUpdateDestroyAPIView` służącego do czynności podanych w nazwie klasy. By powiedzieć klasie jakiego dokładnie obiektu musi poszukać dodajemy metodę `get_object` która zwraca użytkownika którym wysłał zapytanie (request): 
+Lecimy do viesów, tym razem skorzytamy z `generics.RetrieveUpdateDestroyAPIView` służącego do czynności podanych w nazwie klasy. By powiedzieć klasie jakiego dokładnie obiektu musi poszukać dodajemy metodę `get_object` która zwraca użytkownika który wysłał zapytanie (request): 
 
 ```python
 from users.serializers import RegisterUserSerializer, UserSerializer

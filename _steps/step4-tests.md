@@ -9,6 +9,7 @@ Testy jednostkowe to w zasadzie kod testujący inny kod. Aby utrzymać wysokie s
 
 W naszych testach skorzystamy z klas dostarczonych przez Django i DRF `TestCase` oraz `APIClient`. Do endpointów dostaniemy się za pomoca funkcji `reverse` której podamy nazwę URL'a. Bedzię to wygladało tak `reverse('nazwa_aplikacji:nazwa_scieżki')`. Ponadto napiszemy funkcje pomocniczą która będzie tworzyła nowego użytkownika.
 
+W `users/tests/test_api_view.py` napiszemy:
 
 ```python
 from django.test import TestCase
@@ -30,8 +31,7 @@ def create_sample_user(email='test@test.com', username='test', password='testpas
 ```
 
 Gdy mamy potrzebne importy, url'e i funkcje pomocniczą przejdźmy do klasy testowej oraz pierwszego testu. W klasie tej jako pierwszą dodamy metodę `setUp`, wrzucamy tam wszystko co będzie przydane w testach gdyż każdy test bedzie miał potem do tego dostęp. W naszym wypadku dodamy tam instancje klasy `APIClient`, umożliwi nam ona na wysyłanie requestów oraz `payload` z danymi testowego użytkownika.
-
-
+ 
 ```python
 class PublicUserApiTests(TestCase):
     def setUp(self):
@@ -84,15 +84,6 @@ Ok, dodajmy jeszcze może test sprawdzający poprawne logowanie.
 Tutaj najpierw za pomocą funkcji pomocniczej tworzymy nowego użytkownika a potem używając jego danych próbujemy się zalogować. Przeprowadzamy asercję czy `token` znajduję się w zwracanych danych oraz czy kod HTTP to oczekiwane 200_OK.
 
 Ok, czy łapiesz już działanie testów? Napisz teraz swoj własny test o nazwie `test_login_invalid` sprawdzający logowanie się nieistniejącym użytkownikiem.
-
-```python
-    def test_login_invalid(self):
-        payload = {'username': 'test', 'password': 'wrong'}
-        response = self.client.post(LOGIN_URL, payload)
-
-        self.assertNotIn('token', response.data)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-```
 
 Chciałbyś wiecej? Proszę bardzo - napisz test sprawdzający rejestracje ze zbyt krótkim loginem a następnie ze zbyt krótkim hasłem.
 
